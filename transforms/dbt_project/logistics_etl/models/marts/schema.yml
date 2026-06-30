@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: mart_spending_by_agency
+    description: "Aggregated federal contract spending by awarding agency and sub-agency."
+    columns:
+      - name: awarding_agency
+        description: "The federal agency that awarded the contract."
+        tests:
+          - not_null
+      - name: total_award_amount
+        description: "Sum of award amounts for this agency/sub-agency grouping."
+        tests:
+          - not_null
+      - name: contract_count
+        description: "Number of contracts in this grouping."
+        tests:
+          - not_null
