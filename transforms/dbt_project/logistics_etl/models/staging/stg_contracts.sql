@@ -2,12 +2,17 @@
 stg_contracts.sql
 Staging model for raw USASpending.gov contract data.
 Cleans column names, casts types, and filters nulls.
+
+The raw CSV location is resolved through the `raw_data_path` dbt variable
+(see dbt_project.yml), not hardcoded, so this model runs identically
+on a local machine, in a container, or in CI — only the variable's value
+changes per environment.
 */
 
 with source as (
 
     select * from read_csv_auto(
-        '/home/taylo/logistics-etl-pipeline/data/raw/contracts_raw.csv'
+        '{{ var("raw_data_path") }}/contracts_raw.csv'
     )
 
 ),

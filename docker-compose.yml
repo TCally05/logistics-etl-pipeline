@@ -1,0 +1,35 @@
+services:
+  pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: logistics-etl-pipeline:local
+    container_name: logistics-etl-pipeline
+    volumes:
+      - ./data/raw:/app/data/raw
+      - ./data/processed:/app/data/processed
+    env_file:
+      - .env
+    command: python3 ingestion/fetch_usaspending.py
+
+  dbt:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: logistics-etl-pipeline:local
+    container_name: logistics-etl-dbt
+    volumes:
+      - ./data/raw:/app/data/raw
+      - ./data/processed:/app/data/processed
+      - ./transforms/dbt_project/logistics_etl:/app/transforms/dbt_project/logistics_etl
+      - ~/.dbt:/home/appuser/.dbt
+    environment:
+      - DBT_DUCKDB_PATH=/app/data/processed/dev.duckdb
+    env_file:
+      - .env
+    working_dir: /app/transforms/dbt_project/logistics_etl
+    command: >
+      dbt build --vars '{"raw_data_path": "/app/data/raw"}'
+    depends_on:
+      pipeline:
+        condition: service_completed_successfully
